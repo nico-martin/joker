@@ -235,6 +235,7 @@ System.register("WebUSBController", [], function (exports_2, context_2) {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
+                                    console.log(data.byteLength, data);
                                     if (!this.device) return [3 /*break*/, 2];
                                     return [4 /*yield*/, this.device.transferOut(this.endpointOut, data)];
                                 case 1: return [2 /*return*/, _a.sent()];
@@ -264,10 +265,19 @@ System.register("WebUSBController", [], function (exports_2, context_2) {
         }
     };
 });
-System.register("index", ["WebUSBController"], function (exports_3, context_3) {
+System.register("types", [], function (exports_3, context_3) {
     "use strict";
-    var WebUSBController_1;
     var __moduleName = context_3 && context_3.id;
+    return {
+        setters: [],
+        execute: function () {
+        }
+    };
+});
+System.register("index", ["WebUSBController"], function (exports_4, context_4) {
+    "use strict";
+    var WebUSBController_1, JOKE_ENDPOINT;
+    var __moduleName = context_4 && context_4.id;
     return {
         setters: [
             function (WebUSBController_1_1) {
@@ -275,6 +285,7 @@ System.register("index", ["WebUSBController"], function (exports_3, context_3) {
             }
         ],
         execute: function () {
+            JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
             (function () {
                 var _this = this;
                 document.addEventListener('DOMContentLoaded', function (event) {
@@ -283,10 +294,44 @@ System.register("index", ["WebUSBController"], function (exports_3, context_3) {
                     var $connectArea = document.querySelector('#connect-area');
                     var $connectButton = document.querySelector('#connect');
                     var $connectButtonSkip = document.querySelector('#connect-skip');
-                    var $status = document.querySelector('#status');
+                    var $joke = document.querySelector('#joke');
+                    var $muteButton = document.querySelector('#mute-button');
+                    var read = false;
                     /**
                      * Methods
                      */
+                    var loadNewJoke = function () { return __awaiter(_this, void 0, void 0, function () {
+                        var req, json;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    showJoke();
+                                    return [4 /*yield*/, fetch(JOKE_ENDPOINT)];
+                                case 1:
+                                    req = _a.sent();
+                                    return [4 /*yield*/, req.json()];
+                                case 2:
+                                    json = _a.sent();
+                                    showJoke([json.joke || '', json.setup || '', json.delivery].filter(Boolean));
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    var showJoke = function (joke) {
+                        if (joke === void 0) { joke = []; }
+                        $joke.innerHTML = "<p>".concat(joke
+                            .join('</p><p>')
+                            .replace(/(?:\r\n|\r|\n)/g, '<br>'), "</p>");
+                        joke.length !== 0 && doRead();
+                    };
+                    var doRead = function () {
+                        if (read) {
+                            var utter = new SpeechSynthesisUtterance();
+                            utter.lang = 'en-US';
+                            utter.text = $joke.innerText;
+                            speechSynthesis.speak(utter);
+                        }
+                    };
                     /**
                      * Setup
                      */
@@ -302,29 +347,60 @@ System.register("index", ["WebUSBController"], function (exports_3, context_3) {
                     }); });
                     $connectButtonSkip.addEventListener('click', function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            $connectArea.style.display = 'none';
-                            return [2 /*return*/];
+                            switch (_a.label) {
+                                case 0:
+                                    $connectArea.style.display = 'none';
+                                    return [4 /*yield*/, loadNewJoke()];
+                                case 1:
+                                    _a.sent();
+                                    return [2 /*return*/];
+                            }
                         });
                     }); });
-                    Controller.onReceive(function (data) {
-                        if (data.byteLength === 1 && data.getInt8(0) === 1) {
-                            $status.innerText = 'PRESSED';
-                        }
-                        else if (data.byteLength === 1) {
-                            $status.innerText = 'NOT PRESSED';
-                        }
-                        else {
-                            console.log('received', { data: data, decoded: data.getInt8(0) });
-                        }
+                    Controller.onReceive(function (data) { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!(data.byteLength === 1 && data.getInt8(0) === 1)) return [3 /*break*/, 2];
+                                    return [4 /*yield*/, loadNewJoke()];
+                                case 1:
+                                    _a.sent();
+                                    _a.label = 2;
+                                case 2: return [2 /*return*/];
+                            }
+                        });
+                    }); });
+                    Controller.onDeviceConnect(function (device) { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!device) return [3 /*break*/, 2];
+                                    $connectArea.style.display = 'none';
+                                    return [4 /*yield*/, loadNewJoke()];
+                                case 1:
+                                    _a.sent();
+                                    return [3 /*break*/, 3];
+                                case 2:
+                                    $connectArea.style.display = 'flex';
+                                    _a.label = 3;
+                                case 3: return [2 /*return*/];
+                            }
+                        });
+                    }); });
+                    $muteButton.addEventListener('click', function () {
+                        read = !read;
+                        doRead();
+                        $muteButton.querySelectorAll('svg').forEach(function ($svg) {
+                            $svg.style.display =
+                                window.getComputedStyle($svg, null).display === 'none'
+                                    ? 'block'
+                                    : 'none';
+                        });
                     });
-                    Controller.onDeviceConnect(function (device) {
-                        console.log({ device: device });
-                        if (device) {
-                            $connectArea.style.display = 'none';
-                        }
-                        else {
-                            $connectArea.style.display = 'flex';
-                        }
+                    window.addEventListener('keypress', function (ev) {
+                        return ev.which === 32 &&
+                            window.getComputedStyle($connectArea, null).display === 'none' &&
+                            loadNewJoke();
                     });
                 });
             })();
