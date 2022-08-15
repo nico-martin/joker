@@ -371,15 +371,9 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
                     }); });
                     $connectButtonSkip.addEventListener('click', function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    $connectArea.style.display = 'none';
-                                    $joke.innerHTML = "<p class=\"description\">Press the space bar to load joke</p>";
-                                    return [4 /*yield*/, loadNewJoke()];
-                                case 1:
-                                    _a.sent();
-                                    return [2 /*return*/];
-                            }
+                            $connectArea.style.display = 'none';
+                            $joke.innerHTML = "<p class=\"description\">Press the space bar to load joke</p>";
+                            return [2 /*return*/];
                         });
                     }); });
                     Controller.onReceive(function (data) { return __awaiter(_this, void 0, void 0, function () {

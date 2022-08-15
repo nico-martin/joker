@@ -84,8 +84,7 @@ const synth = window.speechSynthesis;
     $connectButtonSkip.addEventListener('click', async () => {
       $connectArea.style.display = 'none';
       $joke.innerHTML = `<p class="description">Press the space bar to load joke</p>`;
-
-      await loadNewJoke();
+      //await loadNewJoke();
     });
 
     Controller.onReceive(async (data) => {
