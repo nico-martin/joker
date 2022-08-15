@@ -2,11 +2,11 @@ import WebUSBController from './WebUSBController';
 import { JokeI } from './types';
 
 const JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
+const synth = window.speechSynthesis;
 
 (function () {
   document.addEventListener('DOMContentLoaded', (event) => {
     const Controller = new WebUSBController();
-    const textDecoder = new TextDecoder('utf-8');
     const $connectArea =
       document.querySelector<HTMLDivElement>('#connect-area');
     const $connectButton =
@@ -40,12 +40,38 @@ const JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
 
     const doRead = () => {
       if (read) {
-        const utter = new SpeechSynthesisUtterance();
-        utter.lang = 'en-US';
-        utter.text = $joke.innerText;
-        speechSynthesis.speak(utter);
+        window.speechSynthesis.cancel();
+        try {
+          const voices = window.speechSynthesis
+            .getVoices()
+            .filter((voice) => voice.lang === 'en-US');
+          const utter = new SpeechSynthesisUtterance();
+          utter.lang = 'en-US';
+          utter.text = $joke.innerText;
+          utter.volume = 1;
+          utter.voice = voices[Math.floor(Math.random() * voices.length)];
+          utter.rate = 1;
+          utter.pitch = 1;
+
+          window.speechSynthesis.speak(utter);
+        } catch (e) {
+          console.log(e);
+        }
       }
     };
+
+    const toggleMute = () => {
+      read = !read;
+      !read && window.speechSynthesis.cancel();
+      $muteButton.querySelectorAll('svg').forEach(($svg) => {
+        $svg.style.display =
+          window.getComputedStyle($svg, null).display === 'none'
+            ? 'block'
+            : 'none';
+      });
+    };
+
+    toggleMute();
 
     /**
      * Setup
@@ -57,6 +83,8 @@ const JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
 
     $connectButtonSkip.addEventListener('click', async () => {
       $connectArea.style.display = 'none';
+      $joke.innerHTML = `<p class="description">Press the space bar to load joke</p>`;
+
       await loadNewJoke();
     });
 
@@ -69,21 +97,16 @@ const JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
     Controller.onDeviceConnect(async (device) => {
       if (device) {
         $connectArea.style.display = 'none';
-        await loadNewJoke();
+        //await loadNewJoke();
+        $joke.innerHTML = `<p class="description">Press buzzer to load joke</p>`;
       } else {
         $connectArea.style.display = 'flex';
       }
     });
 
     $muteButton.addEventListener('click', () => {
-      read = !read;
+      toggleMute();
       doRead();
-      $muteButton.querySelectorAll('svg').forEach(($svg) => {
-        $svg.style.display =
-          window.getComputedStyle($svg, null).display === 'none'
-            ? 'block'
-            : 'none';
-      });
     });
 
     window.addEventListener(

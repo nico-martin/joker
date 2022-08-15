@@ -9,7 +9,8 @@
     "moduleResolution": "node",
     //"strict": true,
     "strictNullChecks": false,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "lib": ["dom", "es2015"]
   },
   "exclude": [
     "node_modules",

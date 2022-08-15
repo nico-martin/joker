@@ -276,7 +276,7 @@ System.register("types", [], function (exports_3, context_3) {
 });
 System.register("index", ["WebUSBController"], function (exports_4, context_4) {
     "use strict";
-    var WebUSBController_1, JOKE_ENDPOINT;
+    var WebUSBController_1, JOKE_ENDPOINT, synth;
     var __moduleName = context_4 && context_4.id;
     return {
         setters: [
@@ -286,11 +286,11 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
         ],
         execute: function () {
             JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
+            synth = window.speechSynthesis;
             (function () {
                 var _this = this;
                 document.addEventListener('DOMContentLoaded', function (event) {
                     var Controller = new WebUSBController_1.default();
-                    var textDecoder = new TextDecoder('utf-8');
                     var $connectArea = document.querySelector('#connect-area');
                     var $connectButton = document.querySelector('#connect');
                     var $connectButtonSkip = document.querySelector('#connect-skip');
@@ -326,12 +326,36 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
                     };
                     var doRead = function () {
                         if (read) {
-                            var utter = new SpeechSynthesisUtterance();
-                            utter.lang = 'en-US';
-                            utter.text = $joke.innerText;
-                            speechSynthesis.speak(utter);
+                            window.speechSynthesis.cancel();
+                            try {
+                                var voices = window.speechSynthesis
+                                    .getVoices()
+                                    .filter(function (voice) { return voice.lang === 'en-US'; });
+                                var utter = new SpeechSynthesisUtterance();
+                                utter.lang = 'en-US';
+                                utter.text = $joke.innerText;
+                                utter.volume = 1;
+                                utter.voice = voices[Math.floor(Math.random() * voices.length)];
+                                utter.rate = 1;
+                                utter.pitch = 1;
+                                window.speechSynthesis.speak(utter);
+                            }
+                            catch (e) {
+                                console.log(e);
+                            }
                         }
                     };
+                    var toggleMute = function () {
+                        read = !read;
+                        !read && window.speechSynthesis.cancel();
+                        $muteButton.querySelectorAll('svg').forEach(function ($svg) {
+                            $svg.style.display =
+                                window.getComputedStyle($svg, null).display === 'none'
+                                    ? 'block'
+                                    : 'none';
+                        });
+                    };
+                    toggleMute();
                     /**
                      * Setup
                      */
@@ -350,6 +374,7 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
                             switch (_a.label) {
                                 case 0:
                                     $connectArea.style.display = 'none';
+                                    $joke.innerHTML = "<p class=\"description\">Press the space bar to load joke</p>";
                                     return [4 /*yield*/, loadNewJoke()];
                                 case 1:
                                     _a.sent();
@@ -372,30 +397,20 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
                     }); });
                     Controller.onDeviceConnect(function (device) { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    if (!device) return [3 /*break*/, 2];
-                                    $connectArea.style.display = 'none';
-                                    return [4 /*yield*/, loadNewJoke()];
-                                case 1:
-                                    _a.sent();
-                                    return [3 /*break*/, 3];
-                                case 2:
-                                    $connectArea.style.display = 'flex';
-                                    _a.label = 3;
-                                case 3: return [2 /*return*/];
+                            if (device) {
+                                $connectArea.style.display = 'none';
+                                //await loadNewJoke();
+                                $joke.innerHTML = "<p class=\"description\">Press buzzer to load joke</p>";
                             }
+                            else {
+                                $connectArea.style.display = 'flex';
+                            }
+                            return [2 /*return*/];
                         });
                     }); });
                     $muteButton.addEventListener('click', function () {
-                        read = !read;
+                        toggleMute();
                         doRead();
-                        $muteButton.querySelectorAll('svg').forEach(function ($svg) {
-                            $svg.style.display =
-                                window.getComputedStyle($svg, null).display === 'none'
-                                    ? 'block'
-                                    : 'none';
-                        });
                     });
                     window.addEventListener('keypress', function (ev) {
                         return ev.which === 32 &&

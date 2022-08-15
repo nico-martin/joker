@@ -145,6 +145,11 @@ button {
     margin-top: 0.75em;
 }
 
+.main-content__joke p.description {
+    font-style: italic;
+    font-size: 3vmin;
+}
+
 .main-content__mute {
     position: fixed;
     right: 5vmin;
