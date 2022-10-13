@@ -265,27 +265,76 @@ System.register("WebUSBController", [], function (exports_2, context_2) {
         }
     };
 });
-System.register("types", [], function (exports_3, context_3) {
+System.register("jokes", [], function (exports_3, context_3) {
     "use strict";
+    var JOKES;
     var __moduleName = context_3 && context_3.id;
     return {
         setters: [],
         execute: function () {
+            exports_3("JOKES", JOKES = [
+                ['What do you call a computer that sings?', 'A dell'],
+                [
+                    'Why are assembly programmers always soaking wet?',
+                    'Because they work below C level.',
+                ],
+                ['Why do programmers prefer dark mode?', 'Because light attracts bugs'],
+                ['Favourite actor of a JavaScript Developer is?', 'JSON Statham'],
+                ['What is Hardware?', 'The part of the computer which you can kick.'],
+                [
+                    'And the bartender says, "Success, but you\'re not ready!"',
+                    'So a JavaScript function walks into a bar.',
+                ],
+                [
+                    'I would tell you a joke about programming...',
+                    'But it only works on my machine',
+                ],
+                ['What did the router say to the doctor?', '"It hurts when IP"'],
+                [
+                    'To replace programmers with robots, clients will have to accurately describe what they want. We are safe.',
+                ],
+                [
+                    "Chuck Norris's keyboard doesn't have a Ctrl key because nothing controls Chuck Norris.",
+                ],
+                [
+                    "Chuck Norris don't need passwords to access your system, he simply types * and system gives him access.",
+                ],
+                ['There are three kinds of lies: Lies, damned lies, and benchmarks.'],
+                [
+                    'Software and cathedrals are much the same - first we build them, then we pray.',
+                ],
+                [
+                    "Programmer (noun.) - A person who fixed a problem that you don't know you have, in a way you don't understand.",
+                ],
+                [
+                    'Girl: What is your idea of perfect date?',
+                    'Boy: DD/MM/YYYY because other formats can be confusing',
+                ],
+                [
+                    "One thing I know is that a computer science major didn't name the original pokemon. Otherwise, charmander would evolve into stringmander.",
+                ],
+                [
+                    'Due to Coronovirus (COVID19) all TCP applications are being converted to UDP to avoid Handshakes..!!',
+                ],
+                ['What did the Java code say to the C code?', "Answer: You've got no class."],
+            ]);
         }
     };
 });
-System.register("index", ["WebUSBController"], function (exports_4, context_4) {
+System.register("index", ["WebUSBController", "jokes"], function (exports_4, context_4) {
     "use strict";
-    var WebUSBController_1, JOKE_ENDPOINT, synth;
+    var WebUSBController_1, jokes_1, synth;
     var __moduleName = context_4 && context_4.id;
     return {
         setters: [
             function (WebUSBController_1_1) {
                 WebUSBController_1 = WebUSBController_1_1;
+            },
+            function (jokes_1_1) {
+                jokes_1 = jokes_1_1;
             }
         ],
         execute: function () {
-            JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
             synth = window.speechSynthesis;
             (function () {
                 var _this = this;
@@ -301,20 +350,10 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
                      * Methods
                      */
                     var loadNewJoke = function () { return __awaiter(_this, void 0, void 0, function () {
-                        var req, json;
                         return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    showJoke();
-                                    return [4 /*yield*/, fetch(JOKE_ENDPOINT)];
-                                case 1:
-                                    req = _a.sent();
-                                    return [4 /*yield*/, req.json()];
-                                case 2:
-                                    json = _a.sent();
-                                    showJoke([json.joke || '', json.setup || '', json.delivery].filter(Boolean));
-                                    return [2 /*return*/];
-                            }
+                            showJoke();
+                            showJoke(jokes_1.JOKES[Math.floor(Math.random() * jokes_1.JOKES.length)]);
+                            return [2 /*return*/];
                         });
                     }); };
                     var showJoke = function (joke) {
@@ -355,7 +394,7 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
                                     : 'none';
                         });
                     };
-                    toggleMute();
+                    //toggleMute();
                     /**
                      * Setup
                      */
@@ -413,6 +452,15 @@ System.register("index", ["WebUSBController"], function (exports_4, context_4) {
                     });
                 });
             })();
+        }
+    };
+});
+System.register("types", [], function (exports_5, context_5) {
+    "use strict";
+    var __moduleName = context_5 && context_5.id;
+    return {
+        setters: [],
+        execute: function () {
         }
     };
 });

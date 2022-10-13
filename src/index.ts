@@ -1,7 +1,6 @@
 import WebUSBController from './WebUSBController';
-import { JokeI } from './types';
 
-const JOKE_ENDPOINT = 'https://v2.jokeapi.dev/joke/Programming';
+import { JOKES } from './jokes';
 const synth = window.speechSynthesis;
 
 (function () {
@@ -24,11 +23,7 @@ const synth = window.speechSynthesis;
 
     const loadNewJoke = async () => {
       showJoke();
-      const req = await fetch(JOKE_ENDPOINT);
-      const json: JokeI = await req.json();
-      showJoke(
-        [json.joke || '', json.setup || '', json.delivery].filter(Boolean)
-      );
+      showJoke(JOKES[Math.floor(Math.random() * JOKES.length)]);
     };
 
     const showJoke = (joke: Array<string> = []): void => {
@@ -71,7 +66,7 @@ const synth = window.speechSynthesis;
       });
     };
 
-    toggleMute();
+    //toggleMute();
 
     /**
      * Setup
