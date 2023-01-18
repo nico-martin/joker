@@ -1,4 +1,7 @@
-import WebUSBController from './WebUSBController';
+import WebUSBController from '@nico-martin/webusb-controller';
+
+import './css/reset.css';
+import './css/styles.css';
 
 import { JOKES } from './jokes';
 const synth = window.speechSynthesis;
